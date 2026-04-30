@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intended Purpose Results | Johner Institute</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'DM Sans', sans-serif; 
+            background-color: #f7f9fc; 
+            margin: 0; 
+            min-height: 100vh;
+        }
+        .johner-red { color: #cc0000; }
+        .johner-bg-red { background-color: #cc0000; }
+        
+        /* Statische Bubble / Karte */
+        .purpose-card {
+            background: white;
+            border: 2px solid #f1f5f9;
+            border-radius: 2rem;
+            padding: 2.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 300px;
+            position: relative;
+        }
+
+        .purpose-card:hover {
+            transform: translateY(-5px);
+            border-color: #cc0000;
+            box-shadow: 0 15px 35px rgba(204, 0, 0, 0.1);
+        }
+
+        .purpose-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Grid Layout */
+        #bubble-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 120px 2rem 50px 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        #status-bar { 
+            position: fixed; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            font-size: 12px; 
+            background: rgba(255,255,255,0.9); 
+            padding: 5px 15px; 
+            border-radius: 20px; 
+            border: 1px solid #e2e8f0; 
+            color: #64748b; 
+            z-index: 100; 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm border-b p-5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-6 h-10">
+                <img src="Johner_Institut_Logo_RGB.png" alt="Johner Logo" class="h-full object-contain">
+                <div class="h-8 w-px bg-slate-200"></div>
+                <img src="hpi-logo-colored.svg" alt="HPI Logo" class="h-full object-contain">
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight uppercase">INTENDED PURPOSE <span class="johner-red">RESULTS</span></h1>
+        </div>
+    </div>
+
+    <!-- Container für statische Karten -->
+    <div id="bubble-container">
+        <!-- Karten werden hier dynamisch eingefügt -->
+    </div>
+
+    <div id="status-bar">Verbindung wird hergestellt...</div>
+
+    <script>
+        const SUPABASE_URL = 'https://icuwbibmhlqpmfgvjibp.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_mc1DYxcquuvbQXqb8xLJwQ_qfs-ccx9';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const container = document.getElementById('bubble-container');
+        const statusBar = document.getElementById('status-bar');
+        let displayedIds = new Set();
+
+        async function loadData() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('submissions')
+                    .select('id, content, created_at')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    statusBar.innerText = "Fehler: " + error.message;
+                    return;
+                }
+
+                if (data && data.length > 0) {
+                    statusBar.innerText = data.length + " Statements live in der Cloud";
+                    data.forEach(item => {
+                        if (!displayedIds.has(item.id)) {
+                            renderCard(item);
+                            displayedIds.add(item.id);
+                        }
+                    });
+                } else {
+                    statusBar.innerText = "Cloud ist bereit. Warte auf erste Eingaben...";
+                }
+            } catch (err) {
+                statusBar.innerText = "Verbindung unterbrochen.";
+            }
+        }
+
+        function renderCard(item) {
+            const card = document.createElement('div');
+            card.className = 'purpose-card';
+            
+            const text = item.content || "";
+            
+            card.innerHTML = `
+                <div class="card-icon johner-red">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M116,32V224a12,12,0,0,1-24,0V32a12,12,0,0,1,24,0Zm48,0a12,12,0,0,0-24,0V224a12,12,0,0,0,24,0Z" opacity="0.2"></path><path d="M200,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V48A16,16,0,0,0,200,32Zm0,176H56V48H200V208ZM92,72v88a8,8,0,0,1-16,0V72a8,8,0,0,1,16,0Zm48-16v144a8,8,0,0,1-16,0V56a8,8,0,0,1,16,0Zm48,32v64a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0Z"></path></svg>
+                </div>
+                <p class="purpose-text">${text}</p>
+                <div class="mt-6 pt-4 border-t border-slate-100 w-full">
+                    <span class="text-[10px] uppercase tracking-widest text-slate-400">Intended Purpose Statement</span>
+                </div>
+            `;
+
+            // Neue Karten werden oben am Container eingefügt
+            container.prepend(card);
+        }
+
+        // Initiales Laden
+        loadData();
+        
+        // Regelmäßiges Polling
+        setInterval(loadData, 5000);
+    </script>
+</body>
+</html>
