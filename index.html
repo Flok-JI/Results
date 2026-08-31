@@ -41,10 +41,13 @@
         }
 
         .purpose-text {
-            font-size: 1.1rem;
+            font-size: 1rem;
             line-height: 1.6;
             color: #1e293b;
             font-weight: 500;
+            white-space: pre-line; /* Sorgt dafür, dass \n als Zeilenumbruch gerendert wird */
+            text-align: left;
+            width: 100%;
         }
 
         .card-icon {
@@ -100,8 +103,9 @@
     <div id="status-bar">Verbindung wird hergestellt...</div>
 
     <script>
+        // Korrekte Supabase-Zugangsdaten (identisch mit dem Generator)
         const SUPABASE_URL = 'https://icuwbibmhlqpmfgvjibp.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'sb_publishable_mc1DYxcquuvbQXqb8xLJwQ_qfs-ccx9';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljdXdiaWJtaGxxcG1mZ3ZqaWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0OTk1NDEsImV4cCI6MjA5MzA3NTU0MX0.8Yo8ueUcOEZt_ZEbIj_OvwCTQ2O3aOfhYxPWT1rq-OI';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const container = document.getElementById('bubble-container');
@@ -146,20 +150,19 @@
                 <div class="card-icon johner-red">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M116,32V224a12,12,0,0,1-24,0V32a12,12,0,0,1,24,0Zm48,0a12,12,0,0,0-24,0V224a12,12,0,0,0,24,0Z" opacity="0.2"></path><path d="M200,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V48A16,16,0,0,0,200,32Zm0,176H56V48H200V208ZM92,72v88a8,8,0,0,1-16,0V72a8,8,0,0,1,16,0Zm48-16v144a8,8,0,0,1-16,0V56a8,8,0,0,1,16,0Zm48,32v64a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0Z"></path></svg>
                 </div>
-                <p class="purpose-text">${text}</p>
+                <div class="purpose-text">${text}</div>
                 <div class="mt-6 pt-4 border-t border-slate-100 w-full">
                     <span class="text-[10px] uppercase tracking-widest text-slate-400">Intended Purpose Statement</span>
                 </div>
             `;
 
-            // Neue Karten werden oben am Container eingefügt
-            container.prepend(card);
+            container.appendChild(card);
         }
 
         // Initiales Laden
         loadData();
         
-        // Regelmäßiges Polling
+        // Regelmäßiges Polling alle 5 Sekunden
         setInterval(loadData, 5000);
     </script>
 </body>
